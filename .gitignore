@@ -1,0 +1,49 @@
+# Environment variables and secrets
+.env
+*.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+.venv/
+.codex_run_venv/
+venv/
+ENV/
+env/
+
+# IDE and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Operating System
+.DS_Store
+Thumbs.db
+desktop.ini
