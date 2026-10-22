@@ -11,6 +11,7 @@ xlrd = ">=2.0.0"
 langchain = "*"
 langchain-community = "*"
 langchain-huggingface = "*"
+langchain-nvidia-ai-endpoints = "*"
 pypdf = "*"
 langchain-text-splitters = "*"
 

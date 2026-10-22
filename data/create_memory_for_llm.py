@@ -9,30 +9,64 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 logging.getLogger("pypdf").setLevel(logging.ERROR)
 
-from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
-# Step 1: Load Raw PDFs
+# Step 1: Load Raw Notes & PDFs
 BASE_DIR = Path(__file__).resolve().parent
-# Use data/ subfolder if it exists, otherwise use the script's directory
-DATA_PATH = str(BASE_DIR / "data") if (BASE_DIR / "data").is_dir() else str(BASE_DIR)
+# Prioritize data_sources/ folder, then data/, then script directory
+if (BASE_DIR / "data_sources").is_dir():
+    DATA_PATH = BASE_DIR / "data_sources"
+elif (BASE_DIR / "data").is_dir():
+    DATA_PATH = BASE_DIR / "data"
+else:
+    DATA_PATH = BASE_DIR
 
-def load_pdf_files(data):
-    loader = DirectoryLoader(
-        data,
-        glob="*.pdf",
+def load_documents(data_path):
+    documents = []
+    data_str = str(data_path)
+
+    # Load PDF files
+    pdf_loader = DirectoryLoader(
+        data_str,
+        glob="**/*.pdf",
         loader_cls=PyPDFLoader
     )
-    documents = loader.load()
+    documents.extend(pdf_loader.load())
+
+    # Load text notes if any are present
+    txt_loader = DirectoryLoader(
+        data_str,
+        glob="**/*.txt",
+        loader_cls=TextLoader,
+        loader_kwargs={"autodetect_encoding": True}
+    )
+    try:
+        documents.extend(txt_loader.load())
+    except Exception:
+        pass
+
+    # Load markdown notes if any are present
+    md_loader = DirectoryLoader(
+        data_str,
+        glob="**/*.md",
+        loader_cls=TextLoader,
+        loader_kwargs={"autodetect_encoding": True}
+    )
+    try:
+        documents.extend(md_loader.load())
+    except Exception:
+        pass
+
     return documents
 
 
 if __name__ == "__main__":
-    print(f"Loading PDFs from: {DATA_PATH}...")
-    documents = load_pdf_files(DATA_PATH)
-    print("Length of PDF Pages:", len(documents))
+    print(f"Loading documents and notes from: {DATA_PATH}...")
+    documents = load_documents(DATA_PATH)
+    print("Total Document Pages / Sections Loaded:", len(documents))
 
     # Step 2: Split Documents into Chunks
     print("Splitting documents into chunks...")
