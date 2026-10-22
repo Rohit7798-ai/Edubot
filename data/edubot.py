@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import streamlit as st
 from dotenv import load_dotenv
-
 load_dotenv()
 
 from langchain_nvidia_ai_endpoints import ChatNVIDIA
@@ -69,8 +68,10 @@ def get_qa_chain():
     llm = ChatNVIDIA(
         model=NVIDIA_MODEL,
         api_key=nvidia_api_key,
-        temperature=0.4,
+        temperature=0.3,
         max_completion_tokens=512,
+        timeout=120,
+        max_retries=3,
     )
 
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
